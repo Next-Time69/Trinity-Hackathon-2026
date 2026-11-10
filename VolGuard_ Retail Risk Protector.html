@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="th"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VolGuard: Retail Risk Protector</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f6fb;--card:#fff;--ink:#12233f;--mut:#5b6b85;--navy:#0b1f3a;--navy2:#16407a;--g:#1fae6a;--r:#d8483f;--y:#e0a21b;--bd:#dde4ef;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1424;--card:#111f36;--ink:#e6edf8;--mut:#9fb0cc;--bd:#223452;color-scheme:dark}}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.6 "IBM Plex Sans Thai",system-ui,sans-serif}
+nav{background:var(--navy);position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;gap:4px;align-items:center;padding:8px 14px;overflow-x:auto}
+nav b{color:#fff;font-size:20px;margin-right:12px;white-space:nowrap;cursor:pointer}nav b i{color:var(--g);font-style:normal}
+nav a{color:#c4d2ea;text-decoration:none;padding:6px 11px;border-radius:8px;white-space:nowrap;font-size:14px}
+nav a.on,nav a:hover{background:var(--navy2);color:#fff}
+main{max-width:1040px;margin:0 auto;padding:20px 14px 40px}
+h1{font-size:clamp(30px,6vw,52px);line-height:1.15;margin:0 0 12px}h2{margin:0 0 12px;font-size:24px}h3{margin:0 0 6px;font-size:17px}
+.hero{background:linear-gradient(135deg,#0b1f3a,#16407a);color:#fff;border-radius:18px;padding:44px 28px}.hero p{max-width:560px;color:#cfe0f7}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:18px;margin-bottom:14px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.btn{background:var(--g);color:#fff;border:0;border-radius:10px;padding:10px 18px;font:inherit;font-weight:500;cursor:pointer}
+.btn.s{background:transparent;color:var(--ink);border:1px solid var(--bd)}.btn:disabled{opacity:.4;cursor:not-allowed}
+.chip{border:1px solid var(--bd);background:var(--card);color:var(--ink);border-radius:20px;padding:6px 14px;font:inherit;cursor:pointer;margin:0 6px 6px 0}.chip.on{background:var(--navy2);color:#fff;border-color:var(--navy2)}
+input[type=number]{font:inherit;padding:8px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--ink);width:150px}
+input[type=range]{width:100%;accent-color:var(--g)}
+.warn{background:#fff4d6;color:#5a4300;border-radius:10px;padding:10px 14px;margin:10px 0;font-size:14px}.bad{background:#fde3e1;color:#7a1d17}.ok{background:#dcf5e8;color:#0d5a34}
+.kpi{font-size:26px;font-weight:700}.mut{color:var(--mut);font-size:14px}
+table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:7px 6px;border-bottom:1px solid var(--bd);text-align:left}
+.bar{height:10px;background:var(--bd);border-radius:6px;overflow:hidden}.bar i{display:block;height:100%}
+.lg{display:flex;align-items:center;gap:6px;font-size:14px}.lg i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.row{display:flex;gap:18px;flex-wrap:wrap;align-items:center}svg{max-width:100%}
+.opt{display:block;padding:9px 12px;border:1px solid var(--bd);border-radius:10px;margin:6px 0;cursor:pointer}.opt.on{border-color:var(--g);background:rgba(31,174,106,.12)}
+details{border-bottom:1px solid var(--bd);padding:10px 0}summary{cursor:pointer;font-weight:500}
+.up{color:var(--g)}.dn{color:var(--r)}footer{font-size:13px;color:var(--mut);padding:10px 14px;max-width:1040px;margin:auto}
+:focus-visible{outline:3px solid var(--g);outline-offset:2px}
+</style></head><body>
+<nav id="nav"></nav><main id="app"></main>
+<footer>⚠ VolGuard เป็นเครื่องมือช่วยวิเคราะห์เพื่อการเรียนรู้ ไม่ใช่คำแนะนำการลงทุนเฉพาะบุคคล ไม่รับประกันผลตอบแทน ข้อมูลราคาและผลการจำลองทั้งหมดเป็นข้อมูลจำลอง ไม่ใช่ราคาตลาดจริง ไม่ควรลงทุนด้วยเงินที่จำเป็นต่อการดำรงชีวิต</footer>
+<script>
+const $=s=>document.querySelector(s),fmt=n=>Math.round(n).toLocaleString('th-TH');
+let S=Object.assign({ans:[],profile:null,amount:5000,w:null,saved:false},(()=>{try{return JSON.parse(localStorage.getItem('vg')||'{}')}catch(e){return{}}})());
+const save=()=>{try{localStorage.setItem('vg',JSON.stringify(S))}catch(e){}};
+const P={C:{n:'Conservative',th:'ความเสี่ยงต่ำ',w:[70,25,5],lim:6},M:{n:'Moderate',th:'ความเสี่ยงปานกลาง',w:[40,40,20],lim:12},A:{n:'Aggressive',th:'ความเสี่ยงสูง',w:[15,35,50],lim:22}};
+// tier assets: [name, share in tier, assumed volatility %/yr, assumed return %/yr]
+const T=[{n:'สินทรัพย์ความเสี่ยงต่ำ',c:'#1fae6a',a:[['เงินสด/ออมทรัพย์',.4,0,1.5],['กองทุนตลาดเงิน',.6,.5,2]]},
+{n:'สินทรัพย์ความเสี่ยงปานกลาง',c:'#3b82f6',a:[['กองทุนตราสารหนี้',.4,5,3.5],['กองทุนดัชนี',.6,15,6.5]]},
+{n:'สินทรัพย์ความเสี่ยงสูง',c:'#e0a21b',a:[['ETF ธีมเติบโต',.6,18,7.5],['หุ้นรายตัว',.4,32,9]]}];
+const Q=[['ประสบการณ์ลงทุนของคุณ?',['ยังไม่เคยลงทุน','น้อยกว่า 2 ปี','มากกว่า 2 ปี']],
+['ต้องการลงทุนนานเท่าไร?',['น้อยกว่า 1 ปี','1–5 ปี','มากกว่า 5 ปี']],
+['หากพอร์ตขาดทุน 10% คุณจะทำอย่างไร?',['ขายทั้งหมดทันที','ถือต่อและรอดู','ซื้อเพิ่มเพราะราคาถูกลง']],
+['ยอมรับการขาดทุนได้มากที่สุดเท่าไร?',['ไม่เกิน 5%','ไม่เกิน 15%','มากกว่า 15%']],
+['เป้าหมายหลักของการลงทุน?',['รักษาเงินต้น','เติบโตอย่างสม่ำเสมอ','ผลตอบแทนสูงสุด แม้เสี่ยง']],
+['มีเงินสำรองฉุกเฉินหรือยัง?',['ยังไม่มี','มี แต่ไม่ถึง 3 เดือน','มีมากกว่า 6 เดือน']],
+['ต้องการสภาพคล่องแค่ไหน?',['อาจต้องใช้เงินเร็ว ๆ นี้','อาจต้องใช้บางส่วน','ไม่จำเป็นต้องใช้']]];
+const hold=w=>T.flatMap((t,i)=>t.a.map(a=>({n:a[0],p:w[i]*a[1],v:a[2],r:a[3],t:i})));
+function met(w){const h=hold(w),vol=h.reduce((s,x)=>s+x.p/100*x.v,0),ret=h.reduce((s,x)=>s+x.p/100*x.r,0);
+return{vol,ret,score:Math.min(100,Math.round(vol/25*100)),max:Math.max(...h.map(x=>x.p)),liq:w[0],mkt:w[1]*.6+w[2],loss:1.65*vol}}
+const curW=()=>S.w||(S.profile?P[S.profile].w:null);
+function classify(a){const s=a.reduce((x,y)=>x+y+1,0);let k=s<=11?'C':s<=16?'M':'A',dn=false;
+if(a[5]===0&&k!=='C'){k=k==='A'?'M':'C';dn=true}return{s,k,dn}}
+function donut(items){const t=items.reduce((s,x)=>s+x.v,0)||1;let acc=0;
+const c=items.filter(x=>x.v>0).map(x=>{const v=x.v/t*100,e=`<circle r="15.9155" cx="18" cy="18" fill="none" stroke="${x.c}" stroke-width="6" stroke-dasharray="${v} ${100-v}" stroke-dashoffset="${25-acc}"/>`;acc+=v;return e}).join('');
+return`<div class="row"><svg viewBox="0 0 36 36" width="190" role="img" aria-label="กราฟวงกลมสัดส่วนพอร์ต">${c}</svg><div>${items.map(x=>`<div class="lg"><i style="background:${x.c}"></i>${x.n} ${x.v.toFixed(1)}%</div>`).join('')}</div></div>`}
+function line(ser,h=200){const all=ser.flatMap(s=>s.p),mn=Math.min(...all),mx=Math.max(...all),n=ser[0].p.length,W=600,px=i=>10+i/(n-1)*(W-20),py=v=>h-14-(v-mn)/((mx-mn)||1)*(h-28);
+return`<svg viewBox="0 0 ${W} ${h}" width="100%" role="img" aria-label="กราฟเส้น">${ser.map(s=>`<polyline fill="none" stroke="${s.c}" stroke-width="2.5" points="${s.p.map((v,i)=>px(i)+','+py(v)).join(' ')}"/>`).join('')}<text x="12" y="12" font-size="11" fill="currentColor">${fmt(mx)}</text><text x="12" y="${h-2}" font-size="11" fill="currentColor">${fmt(mn)}</text></svg><div class="row">${ser.map(s=>`<span class="lg"><i style="background:${s.c}"></i>${s.n}</span>`).join('')}</div>`}
+// simulated stocks (seeded random walk; NOT market data)
+const ST=[{s:'NVDA',n:'NVIDIA Corp.',b:120,v:.03,d:.0012,sd:7,t:'ชิปประมวลผลและ AI',g:['เติบโตสูงจากความต้องการ AI','ส่วนแบ่งตลาด GPU สูง'],w:['ราคาผันผวนมาก','พึ่งพาลูกค้ารายใหญ่ไม่กี่ราย'],f:['ข้อจำกัดการส่งออกชิป','การแข่งขันจากผู้ผลิตรายอื่น','งบลงทุนด้าน AI ของลูกค้า']},
+{s:'MSFT',n:'Microsoft Corp.',b:420,v:.013,d:.0006,sd:11,t:'ซอฟต์แวร์และคลาวด์',g:['รายได้หลากหลาย','กระแสเงินสดแข็งแรง'],w:['มูลค่าหุ้นค่อนข้างสูง','การแข่งขันด้านคลาวด์'],f:['การเติบโตของ Azure','กฎระเบียบด้านการแข่งขัน','อัตราดอกเบี้ย']},
+{s:'AAPL',n:'Apple Inc.',b:220,v:.015,d:.0004,sd:23,t:'อุปกรณ์อิเล็กทรอนิกส์และบริการ',g:['แบรนด์แข็งแกร่ง','รายได้จากบริการเติบโต'],w:['พึ่งพา iPhone มาก','ห่วงโซ่อุปทานกระจุกตัว'],f:['รอบการเปลี่ยนเครื่อง','กฎหมายแอปสโตร์','ภาษีและภูมิรัฐศาสตร์']},
+{s:'AMZN',n:'Amazon.com Inc.',b:190,v:.018,d:.0008,sd:31,t:'อีคอมเมิร์ซและคลาวด์',g:['AWS สร้างกำไรสูง','เครือข่ายโลจิสติกส์'],w:['อัตรากำไรอีคอมเมิร์ซต่ำ','ใช้เงินลงทุนสูง'],f:['กำลังซื้อผู้บริโภค','การเติบโตของ AWS','ต้นทุนขนส่ง']}];
+function series(x){let a=x.sd,r=()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296},p=[x.b];
+for(let i=0;i<60;i++){const z=Math.sqrt(-2*Math.log(r()||1e-9))*Math.cos(6.283*r());p.push(p[i]*(1+x.d+x.v*z))}return p}
+ST.forEach(x=>x.p=series(x));let cs=0,simAmt=10000,simYr=5,simSc='bull';
+const V={
+home(){return`<div class="hero"><h1>Invest Smarter.<br>Understand Your Risk.</h1><p>VolGuard ช่วยนักลงทุนรายย่อยประเมินความทนต่อความเสี่ยง จัดสรรเงินลงทุนให้เหมาะกับงบของตัวเอง และเข้าใจความผันผวนก่อนลงเงินจริง</p><button class="btn" onclick="go('risk')">เริ่มทำแบบประเมินความเสี่ยง</button> <button class="btn s" style="color:#fff;border-color:#5b7db1" onclick="go('learn')">เรียนรู้ก่อน</button></div>
+<h2 style="margin-top:26px">จุดเด่น</h2><div class="grid">${[['ประเมินความเสี่ยงจริง','7 คำถาม คำนวณคะแนนพร้อมเหตุผล'],['จัดพอร์ตตามงบ','เริ่มได้ตั้งแต่ 1,000 บาท ปรับสัดส่วนเองได้'],['เห็นความเสี่ยงก่อนลงทุน','คะแนนความเสี่ยง การกระจุกตัว สภาพคล่อง และแจ้งเตือน'],['ทดลองโดยไม่ใช้เงินจริง','จำลองตลาดขาขึ้น ขาลง และเปรียบเทียบพอร์ต']].map(x=>`<div class="card"><h3>${x[0]}</h3><span class="mut">${x[1]}</span></div>`).join('')}</div>
+<h2>ขั้นตอนการทำงาน</h2><div class="card"><ol><li>ทำแบบประเมินความเสี่ยง → ได้ระดับ Conservative / Moderate / Aggressive</li><li>กรอกงบลงทุน → ระบบแนะนำการจัดพอร์ต</li><li>ปรับสัดส่วนเอง → ระบบคำนวณความเสี่ยงใหม่ทันที</li><li>บันทึกพอร์ตจำลองและดูผลที่ Dashboard</li></ol></div>
+<div class="card"><h3>ทำไมต้องบริหารความเสี่ยง</h3><p>ผลตอบแทนที่สูงมักมาพร้อมความผันผวนที่สูง การรู้ว่าตัวเองรับการขาดทุนได้เท่าไร และกระจายเงินไปหลายสินทรัพย์ ช่วยให้ไม่ตัดสินใจขายตอนตื่นตระหนก หรือซื้อตามกระแสโซเชียล</p></div>`},
+risk(){const a=S.ans,i=a.length;if(i>=7){const c=classify(a),p=P[c.k];return`<h2>ผลการประเมิน</h2><div class="card"><div class="kpi">${p.n}</div><div class="mut">${p.th} · คะแนนรวม ${c.s} / 21</div>${c.dn?'<div class="warn">คุณยังไม่มีเงินสำรองฉุกเฉินที่เพียงพอ ระบบจึงลดระดับความเสี่ยงลงหนึ่งขั้นเพื่อความปลอดภัย</div>':''}<p>${c.k==='C'?'คุณให้ความสำคัญกับการรักษาเงินต้นและต้องการสภาพคล่อง จึงเหมาะกับสินทรัพย์ที่ผันผวนต่ำเป็นหลัก':c.k==='M'?'คุณรับความผันผวนได้ระดับหนึ่งและลงทุนได้ระยะกลาง จึงเหมาะกับการผสมสินทรัพย์ต่ำและกลางอย่างสมดุล':'คุณมีระยะเวลาลงทุนยาว รับการขาดทุนชั่วคราวได้ จึงเหมาะกับสัดส่วนสินทรัพย์เติบโตที่สูงขึ้น แต่ยังต้องกระจายความเสี่ยง'}</p>${a.map((x,j)=>`<div class="mut">${j+1}. ${Q[j][0]} → ${Q[j][1][x]}</div>`).join('')}<br><button class="btn" onclick="go('alloc')">จัดพอร์ตตามระดับนี้</button> <button class="btn s" onclick="retake()">ทำแบบประเมินใหม่</button></div>`}
+return`<h2>แบบประเมินความเสี่ยง</h2><div class="card"><div class="bar"><i style="width:${i/7*100}%;background:var(--g)"></i></div><p class="mut">ข้อ ${i+1} จาก 7</p><h3>${Q[i][0]}</h3>${Q[i][1].map((o,k)=>`<label class="opt"><input type="radio" name="q" onclick="ans(${k})"> ${o}</label>`).join('')}${i?'<button class="btn s" onclick="S.ans.pop();save();render()">ย้อนกลับ</button>':''}</div>`},
+alloc(){if(!S.profile)return`<h2>จัดพอร์ตอัจฉริยะ</h2><div class="card">ต้องทำแบบประเมินความเสี่ยงก่อน ระบบจึงจะจัดพอร์ตให้เหมาะกับคุณ<br><br><button class="btn" onclick="go('risk')">ทำแบบประเมิน</button></div>`;
+return`<h2>จัดพอร์ตอัจฉริยะ</h2><div class="card"><h3>งบลงทุน (บาท)</h3>${[1000,3000,5000,10000].map(x=>`<button class="chip ${S.amount==x?'on':''}" onclick="setAmt(${x})">${fmt(x)}</button>`).join('')}<input type="number" min="100" id="amt" value="${S.amount}" oninput="setAmt(+this.value,1)" aria-label="จำนวนเงินกำหนดเอง"><p class="mut">ระดับของคุณ: <b>${P[S.profile].n}</b> (${P[S.profile].th}) · แนะนำ ${P[S.profile].w.join('/')}</p>
+${T.map((t,i)=>`<div><label><b>${t.n}</b>: <span id="wv${i}"></span></label><input type="range" min="0" max="100" value="${curW()[i]}" oninput="setW(${i},+this.value)"></div>`).join('')}<div id="res"></div><button class="btn s" onclick="S.w=null;save();render()">กลับไปใช้สัดส่วนแนะนำ</button></div>`},
+dash(){if(!S.profile)return`<h2>Dashboard</h2><div class="card">ยังไม่มีข้อมูล เริ่มจากทำแบบประเมินความเสี่ยง<br><br><button class="btn" onclick="go('risk')">เริ่มต้นใช้งาน</button></div>`;
+const w=curW(),m=met(w),h=hold(w);return`<h2>Dashboard</h2>${S.saved?'':'<div class="warn">ยังไม่ได้บันทึกพอร์ต แสดงพอร์ตตามสัดส่วนแนะนำ/ที่ปรับล่าสุด</div>'}<div class="grid"><div class="card"><div class="mut">เงินลงทุนจำลอง</div><div class="kpi">฿${fmt(S.amount)}</div></div><div class="card"><div class="mut">มูลค่าคาดการณ์ 1 ปี (สมมติฐาน)</div><div class="kpi">฿${fmt(S.amount*(1+m.ret/100))}</div></div><div class="card"><div class="mut">ระดับความเสี่ยงของคุณ</div><div class="kpi">${P[S.profile].n}</div></div><div class="card"><div class="mut">คะแนนความเสี่ยงพอร์ต</div><div class="kpi">${m.score}/100</div></div></div>
+<div class="card"><h3>การกระจายสินทรัพย์</h3>${donut(T.map((t,i)=>({n:t.n,v:w[i],c:t.c})))}</div><div class="card"><h3>รายการสินทรัพย์</h3><table><tr><th>สินทรัพย์</th><th>%</th><th>บาท</th></tr>${h.map(x=>`<tr><td>${x.n}</td><td>${x.p.toFixed(1)}</td><td>${fmt(S.amount*x.p/100)}</td></tr>`).join('')}</table></div><div class="card"><h3>คำแนะนำ</h3>${advice(w)}</div>`},
+stock(){const x=ST[cs],p=x.p,l=p[60],ch=(l/p[59]-1)*100,rets=p.slice(1).map((v,i)=>Math.log(v/p[i])),mu=rets.reduce((a,b)=>a+b)/60,vol=Math.sqrt(rets.reduce((a,b)=>a+(b-mu)**2,0)/59*252)*100,sma=p.slice(41).reduce((a,b)=>a+b)/20,lv=vol>40?'สูง':vol>25?'ปานกลาง':'ค่อนข้างต่ำ';
+return`<h2>วิเคราะห์หุ้น</h2><div class="warn bad">ข้อมูลจำลอง (Simulated) สร้างด้วยแบบจำลองสุ่ม ไม่ใช่ราคาตลาดจริง ห้ามใช้ตัดสินใจลงทุน</div>${ST.map((s,i)=>`<button class="chip ${i==cs?'on':''}" onclick="cs=${i};render()">${s.s}</button>`).join('')}<div class="card"><h3>${x.s} · ${x.n}</h3><div class="kpi">$${l.toFixed(2)} <span class="${ch>=0?'up':'dn'}" style="font-size:16px">${ch>=0?'+':''}${ch.toFixed(2)}% (1 วัน, จำลอง)</span></div>${line([{n:'ราคาจำลอง 60 วัน',c:'#3b82f6',p}])}
+<div class="grid"><div><b>แนวโน้ม</b><br>${l>sma?'ราคาอยู่เหนือค่าเฉลี่ย 20 วัน (ขาขึ้นระยะสั้น)':'ราคาอยู่ต่ำกว่าค่าเฉลี่ย 20 วัน (อ่อนตัวระยะสั้น)'}</div><div><b>ความผันผวน (ต่อปี)</b><br>${vol.toFixed(1)}% · ระดับ${lv}</div><div><b>ธุรกิจ</b><br>${x.t}</div></div><p class="mut">ความผันผวนสูงหมายถึงราคาแกว่งแรง อาจขาดทุนได้มากในช่วงสั้น</p>
+<div class="grid"><div><b class="up">จุดแข็ง</b><ul>${x.g.map(a=>`<li>${a}</li>`).join('')}</ul></div><div><b class="dn">จุดอ่อน</b><ul>${x.w.map(a=>`<li>${a}</li>`).join('')}</ul></div><div><b>ปัจจัยที่กระทบราคา</b><ul>${x.f.map(a=>`<li>${a}</li>`).join('')}</ul></div></div></div>`},
+analysis(){const w=curW();if(!w)return`<h2>วิเคราะห์ความเสี่ยง</h2><div class="card">ทำแบบประเมินก่อน <button class="btn" onclick="go('risk')">เริ่มเลย</button></div>`;const m=met(w),lim=P[S.profile].lim,over=m.vol>lim,col=m.score>66?'var(--r)':m.score>33?'var(--y)':'var(--g)';
+const row=(t,v,pct,d)=>`<div class="card"><h3>${t}: ${v}</h3><div class="bar"><i style="width:${Math.min(100,pct)}%;background:var(--g)"></i></div><span class="mut">${d}</span></div>`;
+return`<h2>วิเคราะห์ความเสี่ยงของพอร์ต</h2><div class="warn ${over?'bad':'ok'}">${over?`แจ้งเตือน: ความผันผวนพอร์ต ${m.vol.toFixed(1)}% สูงกว่าที่ระดับ ${P[S.profile].n} รับได้ (${lim}%) ควรลดสัดส่วนสินทรัพย์เสี่ยง`:`พอร์ตอยู่ในระดับที่ ${P[S.profile].n} ยอมรับได้ (ความผันผวน ${m.vol.toFixed(1)}% จากเพดาน ${lim}%)`}</div>
+<div class="card"><div class="mut">Portfolio Risk Score</div><div class="kpi" style="color:${col}">${m.score}/100</div><span class="mut">คำนวณจากความผันผวนถ่วงน้ำหนักตามสมมติฐานของแต่ละสินทรัพย์</span></div>
+${row('การกระจุกตัว',m.max.toFixed(1)+'% ในสินทรัพย์ใหญ่สุด',m.max*1.6,m.max>35?'กระจุกตัวค่อนข้างมาก ถ้าสินทรัพย์นี้ตก พอร์ตจะกระทบแรง':'กระจายได้ดีพอสมควร')}
+${row('ความผันผวน',m.vol.toFixed(1)+'% ต่อปี',m.vol/25*100,'ยิ่งสูงยิ่งแกว่งแรง ทั้งขึ้นและลง')}
+${row('ความเสี่ยงตลาด',m.mkt.toFixed(0)+'% ของพอร์ตอยู่ในสินทรัพย์ที่ขึ้นลงตามตลาดหุ้น',m.mkt,'ตลาดหุ้นตกพร้อมกัน พอร์ตส่วนนี้จะตกตาม')}
+${row('สภาพคล่อง',m.liq.toFixed(0)+'% ถอนได้เร็ว',100-m.liq,m.liq<20?'สภาพคล่องต่ำ หากต้องใช้เงินกะทันหันอาจต้องขายตอนราคาไม่ดี':'มีเงินส่วนที่ใช้ได้ทันทีเพียงพอ')}
+${row('ความเสี่ยงขาดทุน',`อาจขาดทุนประมาณ ${m.loss.toFixed(1)}% ในปีที่แย่ (ประมาณการ)`,m.loss/40*100,`เท่ากับประมาณ ฿${fmt(S.amount*m.loss/100)} จากงบ ฿${fmt(S.amount)} ไม่ใช่ค่าสูงสุดที่เป็นไปได้`)}`},
+learn(){const L=[['หุ้นคืออะไร?','ส่วนแบ่งความเป็นเจ้าของบริษัท ราคาขึ้นลงตามผลประกอบการและความคาดหวัง','ซื้อหุ้น 1 หุ้น = เป็นเจ้าของบริษัทเล็ก ๆ ส่วนหนึ่ง'],['ETF คืออะไร?','กองทุนที่ซื้อขายในตลาดเหมือนหุ้น มักตามดัชนี จึงกระจายความเสี่ยงในตัว','ETF ตามดัชนี S&P 500 ถือหุ้นใหญ่ 500 บริษัทในหน่วยเดียว'],['กองทุนรวมคืออะไร?','เงินของผู้ลงทุนหลายคนรวมกัน ผู้จัดการกองทุนนำไปลงทุนให้','ลงเงิน 1,000 บาท ก็ได้ถือหลายสินทรัพย์'],['Diversification','การกระจายเงินในสินทรัพย์หลายชนิด เพื่อไม่ให้ตัวใดตัวหนึ่งทำให้พอร์ตเสียหายมาก','ไม่ใส่ไข่ทั้งหมดในตะกร้าเดียว'],['Risk and Return','ผลตอบแทนสูงมักมาพร้อมความเสี่ยงสูง ไม่มีผลตอบแทนสูงโดยไม่เสี่ยง','เงินฝากนิ่งแต่ได้น้อย หุ้นแกว่งแต่โอกาสได้มากกว่า'],['Compound Interest','ดอกเบี้ยทบต้น ผลตอบแทนก่อนหน้าสร้างผลตอบแทนต่อ','10,000 บาท ที่ 6% ต่อปี 20 ปี ≈ 32,071 บาท'],['ทำไมไม่ควรลงทุนตามกระแส?','กระแสมักทำให้ซื้อตอนราคาสูงและขายตอนตื่นตระหนก','หุ้นที่ถูกพูดถึงมาก อาจแพงเกินพื้นฐานไปแล้ว'],['บริหารความเสี่ยงเบื้องต้น','มีเงินสำรองก่อน ลงเฉพาะเงินเย็น กระจายสินทรัพย์ และทบทวนพอร์ตเป็นระยะ','เก็บเงินสำรอง 3–6 เดือนก่อนเริ่มลงทุน']];
+return`<h2>ศูนย์การเรียนรู้</h2><div class="card">${L.map(l=>`<details><summary>${l[0]}</summary><p>${l[1]}</p><p class="mut"><b>ตัวอย่าง:</b> ${l[2]}</p></details>`).join('')}</div>`},
+sim(){const sc={bull:['ตลาดขาขึ้น',(r,v)=>r+.8*v],bear:['ตลาดขาลง',(r,v)=>r-1.2*v],side:['ตลาดแกว่งตัว',(r,v)=>r*.3]},cols=['#1fae6a','#3b82f6','#e0a21b','#d8483f'],set=[['Conservative',P.C.w],['Moderate',P.M.w],['Aggressive',P.A.w]];if(curW())set.push(['พอร์ตของฉัน',curW()]);
+const R=set.map((s,i)=>{const m=met(s[1]),r=sc[simSc][1](m.ret,m.vol),p=[simAmt];for(let y=1;y<=simYr;y++)p.push(p[y-1]*(1+r/100));return{n:s[0],c:cols[i],p}});
+return`<h2>จำลองการลงทุน</h2><div class="card"><label>เงินเริ่มต้น <input type="number" min="100" value="${simAmt}" onchange="simAmt=+this.value||1000;render()"></label> <label>ระยะเวลา <select onchange="simYr=+this.value;render()" style="font:inherit;padding:8px">${[1,3,5,10].map(y=>`<option ${y==simYr?'selected':''} value="${y}">${y} ปี</option>`).join('')}</select></label><br><br>${Object.keys(sc).map(k=>`<button class="chip ${k==simSc?'on':''}" onclick="simSc='${k}';render()">${sc[k][0]}</button>`).join('')}${line(R)}<table><tr><th>พอร์ต</th><th>มูลค่าสุดท้าย</th><th>กำไร/ขาดทุน</th></tr>${R.map(r=>{const l=r.p[r.p.length-1],d=l-simAmt;return`<tr><td>${r.n}</td><td>฿${fmt(l)}</td><td class="${d>=0?'up':'dn'}">${d>=0?'+':''}${fmt(d)}</td></tr>`}).join('')}</table><div class="warn">ผลจำลองใช้ผลตอบแทนและความผันผวนตามสมมติฐานของต้นแบบ ไม่ได้รับประกันผลลัพธ์ในอนาคต และเป็นเส้นทางเรียบ ไม่แสดงการแกว่งรายวัน</div></div>`}};
+function advice(w){const m=met(w),a=[];if(m.vol>P[S.profile].lim)a.push('พอร์ตเสี่ยงกว่าระดับที่คุณรับได้ ลองลดสินทรัพย์ความเสี่ยงสูง');if(m.max>35)a.push('มีสินทรัพย์ที่สัดส่วนสูงเกิน 35% ควรกระจายเพิ่ม');if(m.liq<20)a.push('เพิ่มสินทรัพย์สภาพคล่องสูงไว้รองรับเหตุฉุกเฉิน');if(S.ans[5]===0)a.push('สร้างเงินสำรองฉุกเฉิน 3–6 เดือนก่อนเพิ่มเงินลงทุน');a.push('ลงทุนเฉพาะเงินที่ไม่จำเป็นต่อการใช้จ่ายประจำ และทบทวนพอร์ตทุก 6–12 เดือน');return'<ul>'+a.map(x=>`<li>${x}</li>`).join('')+'</ul>'}
+function ans(k){S.ans.push(k);if(S.ans.length>=7){const c=classify(S.ans);S.profile=c.k;S.w=null;S.saved=false}save();render()}
+function retake(){S.ans=[];S.profile=null;S.w=null;S.saved=false;save();render()}
+function setAmt(v,k){S.amount=Math.max(0,v||0);save();k?upd():render()}
+function setW(i,v){const w=(curW()).slice();w[i]=v;S.w=w;S.saved=false;save();upd()}
+function upd(){const w=curW(),t=w.reduce((a,b)=>a+b,0);w.forEach((v,i)=>{const e=$('#wv'+i);if(e)e.textContent=v+'% = ฿'+fmt(S.amount*v/100)});const r=$('#res');if(!r)return;const m=met(w),h=hold(w);
+r.innerHTML=`<div class="warn ${t==100?'ok':'bad'}">ผลรวมสัดส่วน ${t}% ${t==100?'✓ ครบ 100%':'— ต้องเท่ากับ 100% ปัจจุบัน '+(t>100?'เกิน ':'ขาด ')+Math.abs(100-t)+'%'}</div>${t==100?donut(T.map((x,i)=>({n:x.n,v:w[i],c:x.c})))+`<table><tr><th>สินทรัพย์</th><th>%</th><th>บาท</th></tr>${h.map(x=>`<tr><td>${x.n}</td><td>${x.p.toFixed(1)}</td><td>${fmt(S.amount*x.p/100)}</td></tr>`).join('')}</table><p><b>เหตุผล:</b> ระดับ ${P[S.profile].n} จึงถ่วงน้ำหนัก${w[0]>=w[2]&&w[0]>=w[1]?'สินทรัพย์ต่ำเพื่อรักษาเงินต้น':w[2]>=w[0]?'สินทรัพย์เติบโตเพื่อโอกาสผลตอบแทน':'ผสมสินทรัพย์กลางและต่ำอย่างสมดุล'} ความผันผวนพอร์ต ${m.vol.toFixed(1)}% (เพดาน ${P[S.profile].lim}%) · คะแนนความเสี่ยง ${m.score}/100</p><p class="mut">ความเสี่ยง: เงินต้นอาจลดลงได้ โดยเฉพาะหุ้นและ ETF ส่วนตราสารหนี้/ตลาดเงินก็มีความเสี่ยงเครดิตและดอกเบี้ย</p>${m.vol>P[S.profile].lim?'<div class="warn bad">พอร์ตนี้เสี่ยงเกินระดับที่คุณยอมรับได้</div>':''}`:''}<button class="btn" ${t!=100?'disabled':''} onclick="S.saved=true;save();go('dash')">บันทึกพอร์ตจำลอง</button> `}
+const N=[['home','หน้าแรก'],['dash','Dashboard'],['risk','ประเมินความเสี่ยง'],['alloc','จัดพอร์ต'],['stock','วิเคราะห์หุ้น'],['analysis','Risk Analysis'],['learn','เรียนรู้'],['sim','จำลองลงทุน']];
+const go=h=>{location.hash=h};
+function render(){const h=location.hash.slice(1),k=V[h]?h:'home';$('#nav').innerHTML=`<b onclick="go('home')">Vol<i>Guard</i></b>`+N.map(n=>`<a href="#${n[0]}" class="${n[0]==k?'on':''}">${n[1]}</a>`).join('');$('#app').innerHTML=V[k]();if(k=='alloc')upd();window.scrollTo(0,0)}
+addEventListener('hashchange',render);render();
+</script></body></html>
